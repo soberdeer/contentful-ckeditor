@@ -1,0 +1,6 @@
+{
+  "id": "ck-editor",
+  "name": "CKEditor",
+  "srcdoc": "./index.html",
+  "fieldTypes": ["Text", "Symbol"]
+}
