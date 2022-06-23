@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/contentful-ui-extensions-sdk@3"></script>
+  <script
+    src="https://assets.ctfassets.net/29jf35zlt7nz/69bK5nYTa4ptRZYWf2CPBG/dd5c76971a594f5270496f5b8423fd0e/ckeditor.js"
+  ></script>
   <style>
     body {
       margin: 0;
@@ -15,17 +18,15 @@
     .ck-content {
       font-family: 'Roboto', sans-serif;
       min-height: 300px;
+      background-color: #f8f9fa !important;
     }
   </style>
 </head>
 <body data-editor="ClassicEditor" data-collaboration="false" data-revision-history="false">
 <div class="editor"><p></p></div>
-<script src="build/ckeditor.js"></script>
 <script>
   const cfExt = window.contentfulExtension || window.contentfulWidget;
   const ClassicEditor = window.ClassicEditor;
-  console.log('alalala')
-  console.log(ClassicEditor)
   const colors = [
     {
       color: '#000000',
@@ -79,15 +80,15 @@
     },
   ];
 
-  cfExt.init(function (ext) {
+  cfExt.init(async function (ext) {
     let currentValue;
     ext.window.startAutoResizer();
 
-    const editor = ClassicEditor
+    await ClassicEditor
       .create(document.querySelector('.editor'), {
         licenseKey: '',
         placeholder: 'Type the content here',
-        shouldNotGroupWhenFull: true,
+        toolbar: { shouldNotGroupWhenFull: true },
         fontColor: { colors },
         fontBackgroundColor: { colors },
       })
@@ -100,6 +101,8 @@
         console.warn('Build id: ei33y8p4qrml-fhk4vlyg1gne');
         console.error(error);
       });
+
+    const editor = window.editor;
 
     editor.setData(ext.field.getValue());
 
