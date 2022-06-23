@@ -6,6 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/contentful-ui-extensions-sdk@3"></script>
   <style>
     body {
       margin: 0;
@@ -21,129 +22,100 @@
 <div class="editor"><p></p></div>
 <script src="build/ckeditor.js"></script>
 <script>
-  ClassicEditor
-    .create(document.querySelector('.editor'), {
-      licenseKey: '',
-      placeholder: 'Type the content here',
-      shouldNotGroupWhenFull: true,
-      fontColor: {
-        colors: [
-          {
-            color: '#000000',
-            label: 'Black',
-          },
-          {
-            color: '#3D3935',
-            label: 'Charcoal',
-          },
-          {
-            color: '#666666',
-            label: 'Text gray',
-          },
-          {
-            color: '#868685',
-            label: 'Grey',
-          },
-          {
-            color: '#C4C4C4',
-            label: 'Semi light gray',
-          },
-          {
-            color: '#EFEFED',
-            label: 'Light gray',
-          },
-          {
-            color: '#171C8F',
-            label: 'Dark blue',
-          },
-          {
-            color: '#009ACE',
-            label: 'Blue',
-          },
-          {
-            color: '#E03C31',
-            label: 'Red',
-          },
-          {
-            color: '#FFA300',
-            label: 'Orange',
-          },
-          {
-            color: 'rgba(255, 255, 255, 0)',
-            label: 'Transparent',
-            hasBorder: true,
-          },
-          {
-            color: '#ffffff',
-            label: 'White',
-            hasBorder: true,
-          },
-        ],
-      },
-      fontBackgroundColor: {
-        colors: [
-          {
-            color: '#000000',
-            label: 'Black',
-          },
-          {
-            color: '#3D3935',
-            label: 'Charcoal',
-          },
-          {
-            color: '#666666',
-            label: 'Text gray',
-          },
-          {
-            color: '#868685',
-            label: 'Grey',
-          },
-          {
-            color: '#C4C4C4',
-            label: 'Semi light gray',
-          },
-          {
-            color: '#EFEFED',
-            label: 'Light gray',
-          },
-          {
-            color: '#171C8F',
-            label: 'Dark blue',
-          },
-          {
-            color: '#009ACE',
-            label: 'Blue',
-          },
-          {
-            color: '#E03C31',
-            label: 'Red',
-          },
-          {
-            color: '#FFA300',
-            label: 'Orange',
-          },
-          {
-            color: 'rgba(255, 255, 255, 0)',
-            label: 'Transparent',
-            hasBorder: true,
-          },
-          {
-            color: '#ffffff',
-            label: 'White',
-            hasBorder: true,
-          },
-        ],
-      },
-    })
-    .then(editor => {
-      window.editor = editor;
-    })
-    .catch(error => {
-      console.error('Oops, something went wrong!');
-      console.error('Please, report the following error on https://github.com/ckeditor/ckeditor5/issues with the build id and the error stack trace:');
-      console.warn('Build id: ei33y8p4qrml-fhk4vlyg1gne');
-      console.error(error);
+  const cfExt = window.contentfulExtension || window.contentfulWidget;
+  const colors = [
+    {
+      color: '#000000',
+      label: 'Black',
+    },
+    {
+      color: '#3D3935',
+      label: 'Charcoal',
+    },
+    {
+      color: '#666666',
+      label: 'Text gray',
+    },
+    {
+      color: '#868685',
+      label: 'Grey',
+    },
+    {
+      color: '#C4C4C4',
+      label: 'Semi light gray',
+    },
+    {
+      color: '#EFEFED',
+      label: 'Light gray',
+    },
+    {
+      color: '#171C8F',
+      label: 'Dark blue',
+    },
+    {
+      color: '#009ACE',
+      label: 'Blue',
+    },
+    {
+      color: '#E03C31',
+      label: 'Red',
+    },
+    {
+      color: '#FFA300',
+      label: 'Orange',
+    },
+    {
+      color: 'rgba(255, 255, 255, 0)',
+      label: 'Transparent',
+      hasBorder: true,
+    },
+    {
+      color: '#ffffff',
+      label: 'White',
+      hasBorder: true,
+    },
+  ];
+
+  cfExt.init(function (ext) {
+    let currentValue;
+    ext.window.startAutoResizer();
+
+    const editor = ClassicEditor
+      .create(document.querySelector('.editor'), {
+        licenseKey: '',
+        placeholder: 'Type the content here',
+        shouldNotGroupWhenFull: true,
+        fontColor: { colors },
+        fontBackgroundColor: { colors },
+      })
+      .then(editor => {
+        window.editor = editor;
+      })
+      .catch(error => {
+        console.error('Oops, something went wrong!');
+        console.error('Please, report the following error on https://github.com/ckeditor/ckeditor5/issues with the build id and the error stack trace:');
+        console.warn('Build id: ei33y8p4qrml-fhk4vlyg1gne');
+        console.error(error);
+      });
+
+    editor.setData(ext.field.getValue());
+
+    ext.field.onValueChanged(function (value) {
+      if (value !== currentValue) {
+        currentValue = value;
+        editor.setData(value);
+      }
     });
+
+    editor.model.document.on('change', function () {
+      const value = editor.getData();
+
+      if (currentValue !== value) {
+        currentValue = value;
+        ext.field.setValue(value);
+      }
+    });
+  });
 </script>
 </body>
 </html>
