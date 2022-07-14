@@ -19,6 +19,7 @@
       font-family: 'Roboto', sans-serif;
       min-height: 300px;
       background-color: #f8f9fa !important;
+      color: #3D3935
     }
   </style>
 </head>
@@ -84,6 +85,8 @@
     let currentValue;
     ext.window.startAutoResizer();
 
+    let editor = null;
+
     await ClassicEditor
       .create(document.querySelector('.editor'), {
         licenseKey: '',
@@ -92,8 +95,8 @@
         fontColor: { colors },
         fontBackgroundColor: { colors },
       })
-      .then(editor => {
-        window.editor = editor;
+      .then(resultEditor => {
+        editor = resultEditor;
       })
       .catch(error => {
         console.error('Oops, something went wrong!');
@@ -102,25 +105,25 @@
         console.error(error);
       });
 
-    const editor = window.editor;
+    if (editor) {
+      editor.setData(ext.field.getValue() || '');
 
-    editor.setData(ext.field.getValue());
+      ext.field.onValueChanged(function (value) {
+        if (value !== currentValue) {
+          currentValue = value;
+          editor.setData(value);
+        }
+      });
 
-    ext.field.onValueChanged(function (value) {
-      if (value !== currentValue) {
-        currentValue = value;
-        editor.setData(value);
-      }
-    });
+      editor.model.document.on('change', function () {
+        const value = editor.getData();
 
-    editor.model.document.on('change', function () {
-      const value = editor.getData();
-
-      if (currentValue !== value) {
-        currentValue = value;
-        ext.field.setValue(value);
-      }
-    });
+        if (currentValue !== value) {
+          currentValue = value;
+          ext.field.setValue(value);
+        }
+      });
+    }
   });
 </script>
 </body>
